@@ -10,8 +10,8 @@
     "model_save_path": "./meta/"
   },
   "train": {
-    "learning_rate": 0.00001,
-    "batch_size": 50,
+    "learning_rate": 0.0001,
+    "batch_size": 100,
     "epochs": 500
   },
   "data": "./data/"
