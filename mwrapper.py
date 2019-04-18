@@ -19,23 +19,26 @@ class Wrapper(object):
         with open(config, 'r') as f:
             config = json.load(f)
         self.config = config
+        self.best_path = str(self.config['model']['model_save_path'] +
+            self.config['name'] + '_model_best.pt')
         self.model = ConvNet(config['model'])
+        self.continuing = False
         if cont is not None:
             print('loading in weights')
             self.load_model(cont)
+            self.continuing = True
 
         self.cuda = torch.cuda.is_available()
         if self.cuda:
             print('using cuda')
             self.model.cuda()
 
-
-    def train(self, cont=False):
+    def train(self):
         model = self.model
         config = self.config
         trainloader = DataLoader(
             KanjiDataset(self.config, train=True),
-                batch_size=config['train']['batch_size'], pin_memory=True)
+                batch_size=config['train']['batch_size'], shuffle=True, pin_memory=True)
         self.valloader = DataLoader(
             KanjiDataset(self.config, train=False),
                 batch_size=config['train']['batch_size'], pin_memory=True)
@@ -43,7 +46,7 @@ class Wrapper(object):
         self.objective = objective
         optimizer = optim.Adam(model.parameters(), lr=config['train']['learning_rate'])
 
-        bestloss = float('Inf')
+        bestloss = float('Inf') if not self.continuing else self.valid()
         for e in range(config['train']['epochs']):
             avgloss = 0.0
             for i, (x, y) in enumerate(trainloader):
@@ -64,21 +67,20 @@ class Wrapper(object):
             vloss = self.valid()
             if e%5==0:
                 print('epoch: {}, loss: {:.4f}, val_loss: {:.4f}'
-                    .format(e+1, avgloss, vloss ) )
+                    .format( e+1,       avgloss,           vloss ) )
                 # print('epoch: {}, loss: {:.4f}, val_loss: {:.4f}, memory: {:.4f}'
                 #     .format(e+1, avgloss, vloss, torch.cuda.memory_allocated(0) / 1e9 ) )
             if e%20==0:
-                acc, conf = self.eval()
-                print('acc:', acc)
-                print('conf:', conf)
+                self.print_acc()
             if vloss < bestloss:
-                self.save_model('{:.4f}'.format(vloss))
+                path = str(self.config['model']['model_save_path'] +
+                    self.config['name'] + '_model_{:.4f}.pt'.format(vloss))
+                self.save_model(path)
+                self.save_model(self.best_path)
                 bestloss = vloss
 
         self.valloader = None
-        acc, conf = self.eval()
-        print('acc:', acc)
-        print('conf:', conf)
+        self.print_acc()
         return
 
     def valid(self):
@@ -98,8 +100,13 @@ class Wrapper(object):
         for (x, y) in validset:
             pred = self.predict(x)
             acc += (pred == y)
-            conf[pred, y] += 1
+            conf[y, pred] += 1
         return acc/len(validset), conf
+
+    def print_acc(self):
+        acc, conf = self.eval()
+        print('acc:', acc)
+        print('conf:\n', conf)
 
     def predict(self, image):
         image = torch.unsqueeze(image, 0)
@@ -109,19 +116,19 @@ class Wrapper(object):
         pred = torch.argmax(pred[0])
         return pred.item()
 
-    def save_model(self, itr):
-        path = str(self.config['model']['model_save_path'] + self.config['name']
-        + '_model_' + str(itr) + '.pt')
+    def save_model(self, path):
         torch.save( self.model.state_dict(), path )
         print('save:', path)
 
     def load_model(self, cont):
-        if cont == 'cont':
-            pass
-        else:
-            self.model.load_state_dict( torch.load(
-                join(self.config['model']['model_save_path'], cont) ) )
+        path = self.best_path
+        if cont != 'cont':
+            path = join(self.config['model']['model_save_path'], cont)
+        print('loading path:', path)
+        self.model.load_state_dict( torch.load( path ) )
 
 
 if __name__ == '__main__':
-    wrapper = Wrapper('configs/config.json')
+    config = sys.argv[1] if len(sys.argv) > 1 else 'configs/config.json'
+    wrapper = Wrapper(config)
+    wrapper.train()

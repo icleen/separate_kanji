@@ -1,17 +1,17 @@
 {
-  "name": "basic",
+  "name": "basic_small",
   "model": {
     "channels": 3,
     "layers": 3,
-    "layer_size": 32,
+    "layer_size": 8,
     "img_size": 32,
     "classes": 4,
 
     "model_save_path": "./meta/"
   },
   "train": {
-    "learning_rate": 0.00001,
-    "batch_size": 50,
+    "learning_rate": 0.0001,
+    "batch_size": 100,
     "epochs": 500
   },
   "data": "./data/"

@@ -47,7 +47,7 @@ class ConvNet(nn.Module):
 
 
 if __name__ == '__main__':
-    config = 'configs/config.json'
+    config = sys.argv[1] if len(sys.argv) > 1 else 'configs/config.json'
     with open(config, 'r') as f:
         config = json.load(f)
 
