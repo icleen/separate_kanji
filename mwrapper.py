@@ -96,11 +96,11 @@ class Wrapper(object):
         validset = KanjiDataset(self.config, train=False)
         acc = 0
         conf = np.zeros((self.config['model']['classes'],
-            self.config['model']['classes']))
+            self.config['model']['classes']), dtype=np.int32)
         for (x, y) in validset:
             pred = self.predict(x)
             acc += (pred == y)
-            conf[y, pred] += 1
+            conf[y, pred] = conf[y, pred] + 1
         return acc/len(validset), conf
 
     def print_acc(self):

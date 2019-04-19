@@ -5,7 +5,7 @@
     "layers": 3,
     "layer_size": 8,
     "img_size": 32,
-    "classes": 4,
+    "classes": 6,
 
     "model_save_path": "./meta/"
   },

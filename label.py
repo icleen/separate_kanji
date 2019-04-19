@@ -14,7 +14,7 @@ def main():
     output = []
     acc = 0
     conf = np.zeros((wrapper.config['model']['classes'],
-        wrapper.config['model']['classes']))
+        wrapper.config['model']['classes']), dtype=np.int32)
     for i, (x, y) in enumerate(dataset):
         pred = wrapper.predict(x)
         file = dataset.get_file(i)

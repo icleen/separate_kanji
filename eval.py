@@ -7,9 +7,7 @@ def main():
     config = sys.argv[1] if len(sys.argv) > 1 else 'configs/config.json'
     cont = sys.argv[2] if len(sys.argv) > 2 else 'cont'
     wrapper = Wrapper(config, cont=cont)
-    acc, conf = wrapper.eval()
-    print('acc:', acc)
-    print('conf:', conf)
+    wrapper.print_acc()
 
 if __name__ == '__main__':
     main()

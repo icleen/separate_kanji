@@ -6,7 +6,7 @@ from shutil import copyfile
 
 def main():
     datapath = './data/'
-    folders = ['rightleft', 'single', 'topbot', 'unreadable']
+    folders = ['rightleft', 'single', 'topbot', 'unreadable', 'undecided', 'outin_side']
     datal = []
     for cls, fol in enumerate(folders):
         fol = join(datapath, fol)
