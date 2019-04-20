@@ -1,9 +1,9 @@
 {
-  "name": "basic",
+  "name": "basic_small",
   "model": {
     "channels": 3,
     "layers": 3,
-    "layer_size": 32,
+    "layer_size": 8,
     "img_size": 32,
     "classes": 6,
 

@@ -5,16 +5,21 @@ import torch
 from torch.utils.data import Dataset
 import torchvision
 from torchvision import transforms
+from torchvision.datasets import ImageFolder
 
 
 class KanjiDataset(Dataset):
-    def __init__(self, config, train=True):
+    def __init__(self, config, train=True, datapath=None):
         super(KanjiDataset, self).__init__()
-        datap = config['data']
-        datap = join(datap, 'train') if train else join(datap, 'test')
-        self.data = torchvision.datasets.ImageFolder(
-            datap, transform=transforms.Compose(
+        if datapath is None:
+            datapath = config['data']
+            datapath = join(datapath, 'train') if train else join(datapath, 'test')
+        self.data = ImageFolder(
+            datapath, transform=transforms.Compose(
                 [transforms.Resize(config['model']['img_size']), transforms.ToTensor()] ) )
+
+    def get_file(self, index):
+        return self.data.samples[index][0]
 
     def __getitem__(self,index):
         img, label = self.data[index]
