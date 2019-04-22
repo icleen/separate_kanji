@@ -14,5 +14,9 @@
     "batch_size": 100,
     "epochs": 500
   },
-  "data": "./data/"
+  "data": {
+    "root": "./data/",
+    "train": "train",
+    "test": "test"
+  }
 }

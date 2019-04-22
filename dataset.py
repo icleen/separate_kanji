@@ -12,11 +12,15 @@ class KanjiDataset(Dataset):
     def __init__(self, config, train=True, datapath=None):
         super(KanjiDataset, self).__init__()
         if datapath is None:
-            datapath = config['data']
-            datapath = join(datapath, 'train') if train else join(datapath, 'test')
+            datapath = config['data']['root']
+            datapath = join(datapath, config['data']['train']) \
+                if train else join(datapath, config['data']['test'])
         self.data = ImageFolder(
-            datapath, transform=transforms.Compose(
-                [transforms.Resize(config['model']['img_size']), transforms.ToTensor()] ) )
+            datapath,
+            transform=transforms.Compose(
+                [transforms.Resize(config['model']['img_size']),
+                transforms.ToTensor()] )
+            )
 
     def get_file(self, index):
         return self.data.samples[index][0]

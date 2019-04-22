@@ -5,7 +5,7 @@
     "layers": 4,
     "layer_size": 16,
     "img_size": 32,
-    "classes": 60,
+    "classes": 143,
 
     "model_save_path": "./meta/"
   },
@@ -14,5 +14,9 @@
     "batch_size": 100,
     "epochs": 500
   },
-  "data": "./data/"
+  "data": {
+    "root": "./data/",
+    "train": "char_train",
+    "test": "char_test"
+  }
 }

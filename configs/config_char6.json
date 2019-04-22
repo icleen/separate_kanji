@@ -1,11 +1,11 @@
 {
-  "name": "basic2",
+  "name": "chars6",
   "model": {
     "channels": 3,
-    "layers": 4,
-    "layer_size": 4,
+    "layers": 6,
+    "layer_size": 32,
     "img_size": 32,
-    "classes": 6,
+    "classes": 143,
 
     "model_save_path": "./meta/"
   },
@@ -16,7 +16,7 @@
   },
   "data": {
     "root": "./data/",
-    "train": "train",
-    "test": "test"
+    "train": "char_train",
+    "test": "char_test"
   }
 }

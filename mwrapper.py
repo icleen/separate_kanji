@@ -39,14 +39,18 @@ class Wrapper(object):
         trainloader = DataLoader(
             KanjiDataset(self.config, train=True),
                 batch_size=config['train']['batch_size'], shuffle=True, pin_memory=True)
-        self.valloader = DataLoader(
-            KanjiDataset(self.config, train=False),
-                batch_size=config['train']['batch_size'], pin_memory=True)
+        # self.valloader = DataLoader(
+        #     KanjiDataset(self.config, train=False),
+        #         batch_size=config['train']['batch_size'], pin_memory=True)
+        self.valset = KanjiDataset(self.config, train=False)
         objective = nn.CrossEntropyLoss()
         self.objective = objective
         optimizer = optim.Adam(model.parameters(), lr=config['train']['learning_rate'])
 
-        bestloss = float('Inf') if not self.continuing else self.valid()
+        # bestloss = float('Inf') if not self.continuing else self.valid()
+        bestacc = 0.0 if not self.continuing else self.eval()[0]
+        past_best = 0
+        max_past = 50
         for e in range(config['train']['epochs']):
             avgloss = 0.0
             for i, (x, y) in enumerate(trainloader):
@@ -64,20 +68,29 @@ class Wrapper(object):
                 preds = None
                 gc.collect()
             avgloss /= len(trainloader)
-            vloss = self.valid()
+            # vloss = self.valid()
+            vacc = self.eval()[0]
             if e%5==0:
-                print('epoch: {}, loss: {:.4f}, val_loss: {:.4f}'
-                    .format( e+1,       avgloss,           vloss ) )
+                print('epoch: {}, loss: {:.4f}, val_acc: {:.4f}'
+                    .format( e+1,       avgloss,           vacc ) )
                 # print('epoch: {}, loss: {:.4f}, val_loss: {:.4f}, memory: {:.4f}'
                 #     .format(e+1, avgloss, vloss, torch.cuda.memory_allocated(0) / 1e9 ) )
-            if e%20==0:
-                self.print_acc()
-            if vloss < bestloss:
+            # if e%20==0:
+            #     self.print_acc()
+            # if vloss < bestloss:
+            if vacc > bestacc:
                 path = str(self.config['model']['model_save_path'] +
-                    self.config['name'] + '_model_{:.4f}.pt'.format(vloss))
+                    self.config['name'] + '_model_{:.4f}.pt'.format(vacc))
                 self.save_model(path)
                 self.save_model(self.best_path)
-                bestloss = vloss
+                # bestloss = vloss
+                bestacc = vacc
+                past_best = 0
+            else:
+                past_best += 1
+            if past_best >= max_past:
+                print('past')
+                break
 
         self.valloader = None
         self.print_acc()
@@ -92,8 +105,8 @@ class Wrapper(object):
             loss += self.objective(self.model(x), y).item()
         return loss/len(self.valloader)
 
-    def eval(self):
-        validset = KanjiDataset(self.config, train=False)
+    def eval(self, train=False):
+        validset = self.valset if train else KanjiDataset(self.config, train=False)
         acc = 0
         conf = np.zeros((self.config['model']['classes'],
             self.config['model']['classes']), dtype=np.int32)
