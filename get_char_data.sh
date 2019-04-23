@@ -1,8 +1,14 @@
 #!/bin/bash
 
-cp -r ~/Documents/tops/0*/ data/chars/
-cp -r ~/Documents/tops/1*/ data/chars/
-cp -r ~/Documents/tops/2*/ data/chars/
+rm -r data/chars/*
+
+# cp -r ~/Documents/tops/0*/ data/chars/
+# cp -r ~/Documents/tops/1*/ data/chars/
+# cp -r ~/Documents/tops/2*/ data/chars/
+mkdir data/chars/nums/
+cp -r ~/Documents/tops/0*/* data/chars/nums/
+cp -r ~/Documents/tops/1*/* data/chars/nums/
+cp -r ~/Documents/tops/2*/* data/chars/nums/
 cp -r ~/Documents/tops/groups/*/ data/chars/
 
 cp -r ~/Documents/tops/rls/ data/chars/

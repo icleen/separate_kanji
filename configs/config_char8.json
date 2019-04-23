@@ -2,7 +2,7 @@
   "name": "chars8",
   "model": {
     "channels": 3,
-    "layers": 4,
+    "layers": 5,
     "layer_size": 32,
     "img_size": 64,
     "classes": 143,
